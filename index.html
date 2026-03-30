@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trắc nghiệm KHTN 9 - Lăng kính</title>
+    <!-- Cấu hình MathJax để hiển thị công thức vật lý chuẩn xác -->
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']],
+                processEscapes: true
+            },
+            options: {
+                enableMenu: false
+            }
+        };
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="MathJax-script" async></script>
+    <style>
+        :root {
+            --primary: #1a365d;
+            --secondary: #2b6cb0;
+            --accent: #4299e1;
+            --bg: #f0f4f8;
+            --white: #ffffff;
+            --error: #e53e3e;
+            --success: #38a169;
+            --text-dark: #2d3748;
+        }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg);
+            color: var(--text-dark);
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            user-select: none;
+        }
+
+        .hidden { display: none !important; }
+
+        #app {
+            max-width: 600px;
+            margin: 0 auto;
+            width: 100%;
+            background: var(--white);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+        }
+
+        header {
+            background: var(--primary);
+            color: var(--white);
+            padding: 15px;
+            text-align: center;
+            font-size: 14px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-info { display: flex; justify-content: space-between; align-items: center; width: 100%; }
+
+        #welcome-screen {
+            padding: 40px 20px;
+            text-align: center;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .main-title {
+            color: var(--primary);
+            font-size: 26px;
+            font-weight: 800;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+        
+        .prism-icon {
+            margin: 0 auto 20px;
+            width: 80px;
+            height: 80px;
+        }
+
+        .input-group { margin-bottom: 15px; text-align: left; }
+        .input-group label { display: block; margin-bottom: 5px; font-weight: 600; font-size: 14px; }
+        input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 16px;
+            outline: none;
+        }
+
+        .btn-container { display: flex; gap: 15px; margin-top: 30px; }
+        .btn {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: white;
+            text-transform: uppercase;
+        }
+        .btn-practice { background-color: var(--secondary); }
+        .btn-exam { background-color: var(--error); }
+
+        #quiz-screen { flex-grow: 1; padding: 20px; display: flex; flex-direction: column; }
+        .q-number { font-weight: 800; color: var(--secondary); margin-bottom: 10px; display: block; }
+        .q-text { font-size: 19px; line-height: 1.6; margin-bottom: 20px; }
+
+        .options-list { list-style: none; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+        .option-item {
+            padding: 15px;
+            border: 2px solid #edf2f7;
+            border-radius: 10px;
+            cursor: pointer;
+            background: #fff;
+            transition: 0.2s;
+        }
+        .option-item.selected { border-color: var(--secondary); background: #ebf8ff; font-weight: 600; }
+
+        .tf-container { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        .tf-row { border-bottom: 1px solid #edf2f7; }
+        .tf-statement { padding: 12px 0; font-size: 16px; line-height: 1.4; }
+        .tf-actions { display: flex; gap: 5px; padding: 10px 0; justify-content: flex-end; }
+        .btn-tf {
+            padding: 8px 12px;
+            border: 1px solid #cbd5e0;
+            background: white;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            min-width: 65px;
+        }
+        .btn-tf.active-true { background: var(--success); color: white; border-color: var(--success); }
+        .btn-tf.active-false { background: var(--error); color: white; border-color: var(--error); }
+
+        .short-answer-input {
+            width: 100%;
+            padding: 15px;
+            font-size: 18px;
+            border: 2px solid #cbd5e0;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .nav-footer {
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            background: #f8fafc;
+            border-top: 1px solid #e2e8f0;
+            gap: 10px;
+        }
+        .btn-nav { padding: 12px 20px; border: none; border-radius: 8px; background: var(--primary); color: white; font-weight: 600; cursor: pointer; flex: 1; }
+        .btn-nav:disabled { background: #cbd5e0; cursor: not-allowed; }
+
+        #result-screen { padding: 30px 20px; text-align: center; }
+        .score-box { font-size: 50px; font-weight: 900; color: var(--primary); margin: 20px 0; }
+        .rank-badge { display: inline-block; padding: 6px 20px; border-radius: 20px; color: white; font-weight: 800; margin-bottom: 20px; }
+        
+        .review-item { text-align: left; background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 15px; margin-bottom: 15px; }
+        .explanation { background: #f0fff4; padding: 12px; border-left: 4px solid var(--success); margin-top: 10px; font-size: 14px; color: #276749; }
+
+        .copyright { padding: 15px; text-align: center; font-size: 12px; color: #a0aec0; background: #f8fafc; }
+        .warning-text { color: var(--error); font-weight: 800; margin-top: 20px; font-size: 14px; border: 2px dashed var(--error); padding: 10px; border-radius: 8px; }
+    </style>
+</head>
+<body>
+
+<div id="app">
+    <header id="quiz-header" class="hidden">
+        <div class="header-info">
+            <span id="header-user"></span>
+            <span id="timer-display" style="font-family: monospace; font-size: 1.2rem; font-weight: 800;">00:00</span>
+        </div>
+    </header>
+
+    <!-- Welcome -->
+    <div id="welcome-screen">
+        <div class="prism-icon">
+            <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M50 15L90 85H10L50 15Z" stroke="#1a365d" stroke-width="4"/>
+                <path d="M10 65L50 55L90 65" stroke="#4299e1" stroke-width="2" stroke-dasharray="4 2"/>
+            </svg>
+        </div>
+        <div class="main-title">Chủ đề: Lăng kính<br><span style="font-size: 16px; color: var(--secondary);">Khoa học tự nhiên 9</span></div>
+        <div class="input-group"><label>Số báo danh</label><input type="text" id="sbd" placeholder="Ví dụ: 001"></div>
+        <div class="input-group"><label>Họ và tên</label><input type="text" id="fullname" placeholder="Nhập họ tên..."></div>
+        <div class="input-group"><label>Lớp</label><input type="text" id="class-name" placeholder="Ví dụ: 9/1"></div>
+        <div class="input-group"><label>Trường</label><input type="text" id="school-name" placeholder="Tên trường..."></div>
+
+        <div class="btn-container">
+            <button class="btn btn-practice" onclick="startApp('practice')">LUYỆN TẬP</button>
+            <button class="btn btn-exam" onclick="startApp('exam')">KIỂM TRA</button>
+        </div>
+        <div id="exam-warning" class="warning-text hidden">Cảnh báo quan trọng: “Nếu bạn rời khỏi trang làm bài. Hệ thống sẽ tự động nộp bài.”</div>
+    </div>
+
+    <!-- Quiz -->
+    <div id="quiz-screen" class="hidden">
+        <div id="question-container"></div>
+    </div>
+
+    <!-- Nav -->
+    <div id="quiz-nav" class="nav-footer hidden">
+        <button class="btn-nav" id="prev-btn" onclick="changeQuestion(-1)">Quay lại</button>
+        <button class="btn-nav" id="next-btn" onclick="changeQuestion(1)">Câu tiếp</button>
+        <button class="btn-nav" id="submit-btn" style="background-color: var(--success);" onclick="confirmSubmit()">Nộp bài</button>
+    </div>
+
+    <!-- Result -->
+    <div id="result-screen" class="hidden">
+        <h2 id="result-greeting"></h2>
+        <div class="score-box" id="result-score">0/7</div>
+        <div class="rank-badge" id="result-rank">Xếp loại</div>
+        <div id="review-list" style="margin-top: 30px;"></div>
+        <button class="btn btn-practice" style="margin-top: 20px; width: 100%;" onclick="location.reload()">Làm đề mới</button>
+    </div>
+
+    <div class="copyright">Bản quyền thuộc về Trường THCS Thuỷ Phương, Thành phố Huế</div>
+</div>
+
+<script>
+    // NGÂN HÀNG CÂU HỎI LĂNG KÍNH
+    const DATA_BANK = [
+        // MCQ - 24 câu
+        { id: 'LK.1', type: 'mcq', question: 'Lăng kính là một khối chất trong suốt, đồng chất, thường có dạng hình lăng trụ', options: ['tam giác.', 'tứ giác.', 'ngũ giác.', 'tròn.'], answer: 0, explanation: 'Lăng kính thường có dạng lăng trụ tam giác trong các thí nghiệm quang học phổ thông.' },
+        { id: 'LK.2', type: 'mcq', question: 'Hai mặt phẳng giới hạn của lăng kính mà ánh sáng truyền qua được gọi là', options: ['mặt đáy.', 'mặt bên (mặt chiết quang).', 'cạnh lăng kính.', 'trục chính.'], answer: 1, explanation: 'Ánh sáng truyền qua hai mặt bên của lăng kính.' },
+        { id: 'LK.3', type: 'mcq', question: 'Góc hợp bởi hai mặt bên của lăng kính được gọi là', options: ['góc tới.', 'góc phản xạ.', 'góc chiết quang.', 'góc lệch.'], answer: 2, explanation: 'Góc chiết quang $A$ là góc tạo bởi hai mặt bên của lăng kính.' },
+        { id: 'LK.4', type: 'mcq', question: 'Cạnh của lăng kính là', options: ['đường thẳng hợp bởi hai mặt bên.', 'mặt phẳng đối diện góc chiết quang.', 'trục đối xứng của lăng kính.', 'đường phân giác góc chiết quang.'], answer: 0, explanation: 'Giao tuyến của hai mặt bên được gọi là cạnh của lăng kính.' },
+        { id: 'LK.5', type: 'mcq', question: 'Khi chiếu một tia sáng đơn sắc tới mặt bên của lăng kính đặt trong không khí, tia sáng sẽ bị khúc xạ', options: ['một lần.', 'hai lần.', 'ba lần.', 'không bị khúc xạ.'], answer: 1, explanation: 'Tia sáng khúc xạ một lần khi vào lăng kính và một lần khi ra khỏi lăng kính.' },
+        { id: 'LK.6', type: 'mcq', question: 'Mọi tia sáng khi truyền qua lăng kính (có chiết suất lớn hơn môi trường ngoài) đều bị lệch phương về phía', options: ['cạnh của lăng kính.', 'đáy của lăng kính.', 'pháp tuyến.', 'tia tới.'], answer: 1, explanation: 'Qua lăng kính, tia ló luôn bị lệch về phía đáy lăng kính so với tia tới.' },
+        { id: 'LK.7', type: 'mcq', question: 'Góc lệch $D$ của tia sáng qua lăng kính được xác định bằng góc hợp bởi', options: ['tia tới và pháp tuyến.', 'tia ló và mặt đáy.', 'tia tới và tia ló.', 'hai mặt bên.'], answer: 2, explanation: 'Góc lệch $D$ là góc tạo bởi phương của tia tới SI và tia ló JR.' },
+        { id: 'LK.8', type: 'mcq', question: 'Lăng kính có tác dụng gì đối với một chùm ánh sáng trắng?', options: ['Làm chùm sáng trắng hội tụ.', 'Làm chùm sáng trắng phân kỳ.', 'Tán sắc chùm sáng trắng thành dải màu cầu vồng.', 'Hấp thụ hoàn toàn ánh sáng trắng.'], answer: 2, explanation: 'Lăng kính phân tích ánh sáng phức tạp thành các ánh sáng đơn sắc.' },
+        { id: 'LK.9', type: 'mcq', question: 'Chiếu một tia sáng đơn sắc màu đỏ qua lăng kính, tia ló ra sẽ có màu gì?', options: ['Màu trắng.', 'Màu tím.', 'Màu đỏ.', 'Bảy sắc cầu vồng.'], answer: 2, explanation: 'Ánh sáng đơn sắc không bị đổi màu khi qua lăng kính.' },
+        { id: 'LK.10', type: 'mcq', question: 'Tại sao tia tím bị lệch nhiều hơn tia đỏ khi qua lăng kính?', options: ['Vì tia tím đẹp hơn.', 'Vì chiết suất của lăng kính đối với ánh sáng tím lớn hơn đối với ánh sáng đỏ.', 'Vì tia đỏ truyền nhanh hơn trong chân không.', 'Vì góc tới của tia tím lớn hơn.'], answer: 1, explanation: 'Trong cùng một môi trường, chiết suất $n_{tim} > n_{do}$ nên góc lệch của tia tím lớn hơn.' },
+        { id: 'LK.11', type: 'mcq', question: 'Trong cấu tạo của lăng kính, mặt đối diện với góc chiết quang $A$ được gọi là', options: ['mặt bên.', 'mặt chiết quang.', 'đáy lăng kính.', 'đường cao.'], answer: 2, explanation: 'Mặt phẳng nằm đối diện với cạnh (góc $A$) gọi là đáy.' },
+        { id: 'LK.12', type: 'mcq', question: 'Nếu tia tới đi vuông góc với mặt bên thứ nhất của lăng kính thì', options: ['tia sáng bị phản xạ toàn phần ngay lập tức.', 'tia sáng truyền thẳng qua mặt bên thứ nhất.', 'tia sáng bị lệch về phía cạnh.', 'không có tia ló ra khỏi lăng kính.'], answer: 1, explanation: 'Góc tới $i = 0$ nên góc khúc xạ $r = 0$, tia sáng truyền thẳng vào trong.' },
+        { id: 'LK.13', type: 'mcq', question: 'Dụng cụ nào ứng dụng hiện tượng phản xạ toàn phần trong lăng kính?', options: ['Máy ảnh.', 'Kính tiềm vọng (Periscope).', 'Kính lúp.', 'Gương soi.'], answer: 1, explanation: 'Kính tiềm vọng dùng lăng kính phản xạ toàn phần để đổi hướng ánh sáng.' },
+        { id: 'LK.14', type: 'mcq', question: 'Để góc lệch $D$ nhỏ nhất, tia sáng truyền qua lăng kính phải có tính chất', options: ['truyền thẳng vuông góc đáy.', 'đối xứng qua mặt phân giác của góc chiết quang $A$.', 'song song với cạnh lăng kính.', 'không có tia ló.'], answer: 1, explanation: 'Vị trí cực tiểu góc lệch xảy ra khi tia sáng đi đối xứng qua lăng kính.' },
+        { id: 'LK.15', type: 'mcq', question: 'Đặc điểm nào ĐÚNG khi nói về góc chiết quang $A$ của lăng kính?', options: ['Góc $A$ luôn là góc nhọn.', 'Góc $A$ là góc tạo bởi hai mặt bên.', 'Góc $A$ luôn bằng $60^\\circ$.', 'Góc $A$ nằm ở mặt đáy.'], answer: 1, explanation: 'Góc chiết quang là đặc trưng cấu tạo cơ bản của lăng kính.' },
+
+        // TRUE/FALSE - 8 câu
+        {
+            id: 'LK.TF1', type: 'truefalse', context: 'Về cấu tạo và đường truyền ánh sáng qua lăng kính:',
+            statements: [
+                'a) Lăng kính là khối chất trong suốt có hai mặt bên không song song.',
+                'b) Tia ló qua lăng kính luôn lệch về phía cạnh so với tia tới.',
+                'c) Góc chiết quang $A$ có thể là góc vuông.',
+                'd) Hiện tượng tán sắc chỉ xảy ra với ánh sáng phức tạp.'
+            ],
+            correctPattern: [true, false, true, true],
+            explanation: 'b) Sai vì tia ló luôn lệch về phía đáy.'
+        },
+        {
+            id: 'LK.TF2', type: 'truefalse', context: 'Xét lăng kính đặt trong không khí có chiết suất $n > 1$:',
+            statements: [
+                'a) Tia sáng khi vào mặt bên thứ nhất luôn bị khúc xạ về phía pháp tuyến.',
+                'b) Tia sáng khi ra mặt bên thứ hai luôn bị khúc xạ xa pháp tuyến.',
+                'c) Tổng hai góc khúc xạ trong lăng kính ($r_1 + r_2$) bằng góc chiết quang $A$.',
+                'd) Nếu góc chiết quang $A = 0$ thì khối chất đó vẫn được gọi là lăng kính.'
+            ],
+            correctPattern: [true, true, true, false],
+            explanation: 'd) Nếu $A=0$ thì hai mặt song song, là bản mặt song song, không phải lăng kính.'
+        },
+        {
+            id: 'LK.TF3', type: 'truefalse', context: 'Ứng dụng của lăng kính:',
+            statements: [
+                'a) Lăng kính phản xạ toàn phần có thể làm đảo ngược hình ảnh.',
+                'b) Trong máy quang phổ, lăng kính dùng để phân tích ánh sáng.',
+                'c) Cầu vồng là kết quả của sự tán sắc ánh sáng qua các lăng kính thủy tinh khổng lồ trên trời.',
+                'd) Lăng kính có thể dùng để tập trung ánh sáng tại một điểm như thấu kính hội tụ.'
+            ],
+            correctPattern: [true, true, false, false],
+            explanation: 'c) Sai (qua giọt nước mưa). d) Sai (lăng kính làm lệch phương chứ không hội tụ tại tiêu điểm).'
+        },
+        {
+            id: 'LK.TF4', type: 'truefalse', context: 'Về hiện tượng tán sắc qua lăng kính:',
+            statements: [
+                'a) Ánh sáng trắng bị phân tích thành 7 vùng màu chính từ đỏ đến tím.',
+                'b) Màu đỏ bị lệch nhiều nhất do có vận tốc chậm nhất.',
+                'c) Ánh sáng đơn sắc không bị tán sắc khi đi qua lăng kính.',
+                'd) Chiết suất của chất làm lăng kính phụ thuộc vào màu sắc ánh sáng chiếu tới.'
+            ],
+            correctPattern: [true, false, true, true],
+            explanation: 'b) Sai (đỏ lệch ít nhất).'
+        },
+
+        // SHORT - 8 câu
+        { id: 'LK.SH1', type: 'short', question: 'Một tia sáng đơn sắc đi qua lăng kính có góc chiết quang $A = 60^\\circ$. Biết góc khúc xạ tại mặt bên thứ nhất là $r_1 = 30^\\circ$. Tính góc tới tại mặt bên thứ hai $r_2$ (đơn vị: độ).', answer: '30', explanation: '$r_2 = A - r_1 = 60 - 30 = 30^\\circ$.' },
+        { id: 'LK.SH2', type: 'short', question: 'Hiện tượng ánh sáng trắng bị phân tách thành dải màu khi qua lăng kính gọi là hiện tượng gì?', answer: 'tán sắc', explanation: 'Đó là sự tán sắc ánh sáng.' },
+        { id: 'LK.SH3', type: 'short', question: 'Trong máy quang phổ, bộ phận nào dùng để phân tán chùm sáng trắng thành các chùm đơn sắc?', answer: 'lăng kính', explanation: 'Lăng kính (hoặc lưới nhiễu xạ) là bộ phận tán sắc.' },
+        { id: 'LK.SH4', type: 'short', question: 'Tia ló qua lăng kính luôn lệch về phía nào của lăng kính so với tia tới?', answer: 'đáy', explanation: 'Lệch về phía đáy.' },
+        { id: 'LK.SH5', type: 'short', question: 'Góc hợp bởi tia ló và tia tới gọi là góc gì?', answer: 'góc lệch', explanation: 'Góc lệch $D$.' },
+        { id: 'LK.SH6', type: 'short', question: 'Nếu chiết suất của lăng kính là $n = 1,414$ ($\approx \sqrt{2}$). Tính giá trị góc giới hạn phản xạ toàn phần khi ánh sáng từ lăng kính ra không khí (đơn vị: độ).', answer: '45', explanation: '$\sin i_{gh} = 1/\sqrt{2} \Rightarrow i_{gh} = 45^\circ$.' }
+    ];
+
+    let currentQuestions = [];
+    let userAnswers = {};
+    let currentIndex = 0;
+    let timerInterval;
+    let timeLeft = 0;
+    let isExam = false;
+    let isFinished = false;
+    let currentUser = {};
+
+    function shuffle(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array;
+    }
+
+    function startApp(mode) {
+        const sbd = document.getElementById('sbd').value.trim();
+        const name = document.getElementById('fullname').value.trim();
+        if (!sbd || !name) { alert('Vui lòng nhập SBD và Họ tên!'); return; }
+
+        currentUser = { sbd, name, class: document.getElementById('class-name').value, school: document.getElementById('school-name').value };
+        localStorage.setItem('lk_user_info', JSON.stringify(currentUser));
+        isExam = mode === 'exam';
+
+        if (isExam) {
+            document.getElementById('exam-warning').classList.remove('hidden');
+            if (document.documentElement.requestFullscreen) document.documentElement.requestFullscreen();
+        }
+
+        // TẠO ĐỀ CỐ ĐỊNH 20 CÂU (12-4-4)
+        const mcqs = shuffle([...DATA_BANK.filter(q => q.type === 'mcq')]).slice(0, 12);
+        const tfs = shuffle([...DATA_BANK.filter(q => q.type === 'truefalse')]).slice(0, 4);
+        const shorts = shuffle([...DATA_BANK.filter(q => q.type === 'short')]).slice(0, 4);
+
+        currentQuestions = [...mcqs, ...tfs, ...shorts];
+
+        // Backup nếu thiếu câu hỏi
+        while (currentQuestions.length < 20) {
+            const extra = DATA_BANK.find(q => !currentQuestions.includes(q));
+            if(extra) currentQuestions.push(extra); else break;
+        }
+
+        document.getElementById('welcome-screen').classList.add('hidden');
+        document.getElementById('quiz-header').classList.remove('hidden');
+        document.getElementById('quiz-screen').classList.remove('hidden');
+        document.getElementById('quiz-nav').classList.remove('hidden');
+        document.getElementById('header-user').innerText = `${name} - SBD: ${sbd}`;
+        
+        currentIndex = 0;
+        userAnswers = {};
+        renderQuestion();
+        startTimer();
+    }
+
+    function startTimer() {
+        clearInterval(timerInterval);
+        const q = currentQuestions[currentIndex];
+        timeLeft = q.type === 'mcq' ? 90 : 120;
+        updateTimerUI();
+        timerInterval = setInterval(() => {
+            timeLeft--;
+            updateTimerUI();
+            if (timeLeft <= 0) changeQuestion(1);
+        }, 1000);
+    }
+
+    function updateTimerUI() {
+        const m = Math.floor(timeLeft/60); const s = timeLeft%60;
+        const disp = document.getElementById('timer-display');
+        disp.innerText = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+        disp.style.color = timeLeft < 15 ? 'red' : 'white';
+    }
+
+    function renderQuestion() {
+        const q = currentQuestions[currentIndex];
+        const container = document.getElementById('question-container');
+        
+        let label = ""; let num = 0;
+        if (currentIndex < 12) { label = "PHẦN I"; num = currentIndex + 1; }
+        else if (currentIndex < 16) { label = "PHẦN II"; num = currentIndex - 11; }
+        else { label = "PHẦN III"; num = currentIndex - 15; }
+
+        let html = `<span class="q-number">${label} - Câu ${num}. (Câu ${currentIndex + 1}/20)</span>`;
+
+        if (q.type === 'mcq') {
+            html += `<div class="q-text">${q.question}</div><ul class="options-list">`;
+            q.options.forEach((opt, i) => {
+                html += `<li class="option-item ${userAnswers[currentIndex] === i ? 'selected' : ''}" onclick="selectMCQ(${i})">
+                    <strong>${String.fromCharCode(65+i)}.</strong> &nbsp; ${opt}</li>`;
+            });
+            html += `</ul>`;
+        } else if (q.type === 'truefalse') {
+            html += `<div class="q-text">${q.context}</div><table class="tf-container">`;
+            q.statements.forEach((s, i) => {
+                const ans = userAnswers[currentIndex]?.[i];
+                html += `<tr class="tf-row"><td class="tf-statement">${s}</td><td class="tf-actions">
+                    <button class="btn-tf ${ans===true?'active-true':''}" onclick="selectTF(${i},true)">Đúng</button>
+                    <button class="btn-tf ${ans===false?'active-false':''}" onclick="selectTF(${i},false)">Sai</button>
+                </td></tr>`;
+            });
+            html += `</table>`;
+        } else {
+            html += `<div class="q-text">${q.question}</div>
+                <input type="text" class="short-answer-input" oninput="saveShort(this.value)" value="${userAnswers[currentIndex]||''}" placeholder="Nhập đáp án...">`;
+        }
+
+        container.innerHTML = html;
+        if (window.MathJax) MathJax.typesetPromise([container]);
+
+        document.getElementById('prev-btn').disabled = currentIndex === 0;
+        document.getElementById('next-btn').classList.toggle('hidden', currentIndex === currentQuestions.length - 1);
+        document.getElementById('submit-btn').classList.toggle('hidden', currentIndex !== currentQuestions.length - 1);
+    }
+
+    function selectMCQ(i) { if(isFinished) return; userAnswers[currentIndex] = i; playSound(800, 0.1); renderQuestion(); }
+    function selectTF(i, v) { if(isFinished) return; if(!userAnswers[currentIndex]) userAnswers[currentIndex] = {}; userAnswers[currentIndex][i] = v; playSound(800, 0.1); renderQuestion(); }
+    function saveShort(v) { userAnswers[currentIndex] = v; }
+
+    function changeQuestion(dir) {
+        if(isFinished) return;
+        currentIndex += dir;
+        if (currentIndex < 0) currentIndex = 0;
+        if (currentIndex >= currentQuestions.length) { currentIndex = currentQuestions.length - 1; return; }
+        renderQuestion(); startTimer();
+    }
+
+    function playSound(freq, dur) {
+        try {
+            const ctx = new (window.AudioContext || window.webkitAudioContext)();
+            const osc = ctx.createOscillator();
+            const g = ctx.createGain();
+            osc.connect(g); g.connect(ctx.destination);
+            osc.frequency.value = freq; osc.type = 'sine';
+            g.gain.setValueAtTime(0.05, ctx.currentTime);
+            g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + dur);
+            osc.start(); osc.stop(ctx.currentTime + dur);
+        } catch(e) {}
+    }
+
+    function confirmSubmit() { if(confirm('Bạn có muốn nộp bài không?')) finishQuiz(); }
+
+    function finishQuiz() {
+        if(isFinished) return; isFinished = true;
+        clearInterval(timerInterval);
+        playSound(1000, 0.3);
+
+        let score = 0;
+        currentQuestions.forEach((q, idx) => {
+            const ua = userAnswers[idx];
+            if (q.type === 'mcq' && ua === q.answer) score += 0.25;
+            else if (q.type === 'truefalse') {
+                let count = 0; q.correctPattern.forEach((v, i) => { if(ua && ua[i] === v) count++; });
+                if(count === 1) score += 0.0625; else if(count === 2) score += 0.125; else if(count === 3) score += 0.25; else if(count === 4) score += 0.5;
+            } else if (q.type === 'short' && ua?.trim().toLowerCase() === q.answer.toLowerCase()) score += 0.5;
+        });
+
+        showResults(Math.min(7, Math.round(score * 10) / 10));
+    }
+
+    function showResults(score) {
+        document.getElementById('quiz-screen').classList.add('hidden');
+        document.getElementById('quiz-nav').classList.add('hidden');
+        document.getElementById('quiz-header').classList.add('hidden');
+        document.getElementById('result-screen').classList.remove('hidden');
+        document.getElementById('result-greeting').innerText = `Chúc mừng ${currentUser.name}!`;
+        document.getElementById('result-score').innerText = `${score.toFixed(1)} / 7.0`;
+        
+        const badge = document.getElementById('result-rank');
+        if (score >= 6) { badge.innerText = 'XUẤT SẮC'; badge.style.backgroundColor = '#38a169'; }
+        else if (score >= 5) { badge.innerText = 'GIỎI'; badge.style.backgroundColor = '#2b6cb0'; }
+        else if (score >= 4) { badge.innerText = 'KHÁ'; badge.style.backgroundColor = '#d69e2e'; }
+        else if (score >= 3) { badge.innerText = 'ĐẠT'; badge.style.backgroundColor = '#718096'; }
+        else { badge.innerText = 'CHƯA ĐẠT'; badge.style.backgroundColor = '#e53e3e'; }
+
+        const list = document.getElementById('review-list');
+        list.innerHTML = '<h3>Lời giải chi tiết:</h3>';
+        currentQuestions.forEach((q, i) => {
+            const div = document.createElement('div');
+            div.className = 'review-item';
+            div.innerHTML = `<strong>Câu ${i+1}:</strong> ${q.question || q.context}<div class="explanation">${q.explanation}</div>`;
+            list.appendChild(div);
+        });
+        if (window.MathJax) MathJax.typesetPromise([list]);
+    }
+
+    // Chống gian lận
+    document.addEventListener("visibilitychange", () => {
+        if (isExam && !isFinished && document.visibilityState === 'hidden') {
+            alert("Hệ thống phát hiện bạn rời trang. Bài làm đã được tự động nộp!"); finishQuiz();
+        }
+    });
+
+    window.onload = () => {
+        const saved = localStorage.getItem('lk_user_info');
+        if (saved) {
+            const data = JSON.parse(saved);
+            document.getElementById('sbd').value = data.sbd || '';
+            document.getElementById('fullname').value = data.name || '';
+            document.getElementById('class-name').value = data.class || '';
+            document.getElementById('school-name').value = data.school || '';
+        }
+    };
+</script>
+</body>
+</html>
